@@ -1,64 +1,112 @@
 package io.faceter.exoplayerfullscreen;
 
-import android.net.Uri;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.exoplayer2.ui.PlayerView;
 
-import io.faceter.util.ExoPlayerVideoHandler;
+import io.faceter.util.ExoPlayerViewManager;
 
+// Fullscreen related code taken from Android Studio blueprint
 public class FullscreenVideoActivity extends AppCompatActivity {
 
-    private String videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/hls/TearsOfSteel.m3u8";
-    private boolean destroyVideo = false;
-    private PlayerView exoPlayerView;
+    /**
+     * Some older devices needs a small delay between UI widget updates
+     * and a change of the status and navigation bar.
+     */
+    private static final int UI_ANIMATION_DELAY = 300;
+    private final Handler mHideHandler = new Handler();
+    private View mContentView;
+    private final Runnable mHidePart2Runnable = new Runnable() {
+        @SuppressLint("InlinedApi")
+        @Override
+        public void run() {
+            // Delayed removal of status and navigation bar
+
+            // Note that some of these constants are new as of
+            // API 19 (KitKat). It is safe to use them, as they are inlined
+            // at compile-time and do nothing on earlier devices.
+            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+    };
+    private final Runnable mHideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            hide();
+        }
+    };
+
+    private String mVideoUri;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscreen);
-    }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-        exoPlayerView = findViewById(R.id.exoplayer_video);
-        TextureView frame = findViewById(R.id.media_frame);
-        ExoPlayerVideoHandler.getInstance()
-                .prepareExoPlayerForUri(getApplicationContext(),
-                        Uri.parse(videoUrl), exoPlayerView, frame);
-        ExoPlayerVideoHandler.getInstance().goToForeground();
+        setContentView(R.layout.activity_fullscreen_video);
 
-        findViewById(R.id.exo_fullscreen_button).setOnClickListener(
-                new View.OnClickListener(){
+        mContentView = findViewById(R.id.enclosing_layout);
+        PlayerView playerView = findViewById(R.id.player_view);
+
+        mVideoUri = getIntent().getStringExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI);
+        ExoPlayerViewManager.getInstance(mVideoUri)
+                .prepareExoPlayer(this, playerView);
+
+        // Set the fullscreen button to "close fullscreen" icon
+        View controlView = playerView.findViewById(R.id.exo_controller);
+        ImageView fullscreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
+        fullscreenIcon.setImageResource(R.drawable.exo_controls_fullscreen_exit);
+
+        controlView.findViewById(R.id.exo_fullscreen_button)
+                .setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
-                        destroyVideo = false;
+                    public void onClick(View v) {
                         finish();
                     }
                 });
     }
 
     @Override
-    public void onBackPressed(){
-        destroyVideo = false;
-        super.onBackPressed();
+    public void onResume() {
+        super.onResume();
+        ExoPlayerViewManager.getInstance(mVideoUri).goToForeground();
     }
 
     @Override
-    protected void onPause(){
+    public void onPause() {
         super.onPause();
-        ExoPlayerVideoHandler.getInstance().goToBackground();
+        ExoPlayerViewManager.getInstance(mVideoUri).goToBackground();
     }
 
     @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        if(destroyVideo){
-            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
-        }
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        // Trigger the initial hide() shortly after the activity has been
+        // created, to briefly hint to the user that UI controls
+        // are available.
+        delayedHide();
+    }
+
+    private void hide() {
+        // Schedule a runnable to remove the status and navigation bar after a delay
+        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+    }
+
+    /**
+     * Schedules a call to hide() in delay milliseconds, canceling any
+     * previously scheduled calls.
+     */
+    private void delayedHide() {
+        mHideHandler.removeCallbacks(mHideRunnable);
+        mHideHandler.postDelayed(mHideRunnable, 100);
     }
 }

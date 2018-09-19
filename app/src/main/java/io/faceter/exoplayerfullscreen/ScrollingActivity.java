@@ -3,8 +3,6 @@ package io.faceter.exoplayerfullscreen;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -31,28 +29,14 @@ public class ScrollingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         exoPlayerView = findViewById(R.id.exo_player);
         frame = findViewById(R.id.media_frame);
 
         if (videoUrl != null && exoPlayerView != null) {
             ExoPlayerVideoHandler.getInstance().prepareExoPlayerForUri(this, Uri.parse(videoUrl), exoPlayerView, frame);
             ExoPlayerVideoHandler.getInstance().goToForeground();
-            exoPlayerView.requestFocus();
+            //exoPlayerView.requestFocus();
         }
-
 
         fullscreen = findViewById(R.id.exo_fullscreen_button);
         fullscreen.setOnClickListener(new View.OnClickListener() {
@@ -64,9 +48,15 @@ public class ScrollingActivity extends AppCompatActivity {
         });
     }
 
-    private void goToFullscreen(){
+    @Override
+    protected void onResume() {
+        super.onResume();
+       // ExoPlayerViewManager.getInstance(mVideoUri).goToForeground();
+    }
+
+    private void goToFullscreen() {
         Intent intent = new Intent(this,
-                FullscreenVideoActivity.class);
+                FullscreenVideoActivityOld.class);
         startActivity(intent);
     }
 

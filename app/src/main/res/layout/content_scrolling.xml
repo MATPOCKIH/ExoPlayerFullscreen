@@ -13,14 +13,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextureView
-            android:visibility="gone"
-            android:id="@+id/media_frame"
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/exo_player"
             android:layout_width="match_parent"
             android:layout_height="200dp" />
 
         <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/exo_player"
+            android:id="@+id/exo_player2"
             android:layout_width="match_parent"
             android:layout_height="200dp" />
 
