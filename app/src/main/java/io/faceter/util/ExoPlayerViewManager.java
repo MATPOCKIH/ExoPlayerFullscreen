@@ -3,7 +3,7 @@ package io.faceter.util;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.view.SurfaceView;
+import android.view.TextureView;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -30,7 +30,8 @@ public class ExoPlayerViewManager {
 
     private DefaultDataSourceFactory dataSourceFactory;
     private SimpleExoPlayer player;
-    private boolean isPlayerPlaying;
+    public boolean isPlayerPlaying;
+    private boolean isMustPlaying;
 
 
     public static ExoPlayerViewManager getInstance(String videoUri) {
@@ -66,10 +67,12 @@ public class ExoPlayerViewManager {
 
             // Prepare the player with the source.
             isPlayerPlaying = true;
+            isMustPlaying = true;
             player.prepare(videoSource);
         }
         player.clearVideoSurface();
-        player.setVideoSurfaceView((SurfaceView) exoPlayerView.getVideoSurfaceView());
+      //  player.setVideoSurfaceView((SurfaceView) exoPlayerView.getVideoSurfaceView());
+        player.setVideoTextureView((TextureView) exoPlayerView.getVideoSurfaceView());
        // player.seekTo(player.getCurrentPosition() + 1);
         exoPlayerView.setPlayer(player);
     }
@@ -82,14 +85,14 @@ public class ExoPlayerViewManager {
     }
 
     public void goToBackground() {
-        if (player != null) {
+        if (player != null && !isMustPlaying) {
             isPlayerPlaying = player.getPlayWhenReady();
             player.setPlayWhenReady(false);
         }
     }
 
     public void goToForeground() {
-        if (player != null) {
+        if (player != null && isMustPlaying) {
             player.setPlayWhenReady(isPlayerPlaying);
         }
     }
@@ -125,6 +128,22 @@ public class ExoPlayerViewManager {
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
             }
+        }
+    }
+
+    public void pausePlayer(){
+        if (player != null) {
+            player.setPlayWhenReady(false);
+            isPlayerPlaying = false;
+            isMustPlaying = false;
+        }
+    }
+
+    public void playPlayer(){
+        if (player != null) {
+            player.setPlayWhenReady(true);
+            isPlayerPlaying = true;
+            isMustPlaying = true;
         }
     }
 }

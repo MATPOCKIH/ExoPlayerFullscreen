@@ -72,6 +72,22 @@ public class FullscreenVideoActivity extends AppCompatActivity {
                         finish();
                     }
                 });
+
+        controlView.findViewById(R.id.exo_play)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ExoPlayerViewManager.getInstance(mVideoUri).playPlayer();
+                    }
+                });
+
+        controlView.findViewById(R.id.exo_pause)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ExoPlayerViewManager.getInstance(mVideoUri).pausePlayer();
+                    }
+                });
     }
 
     @Override

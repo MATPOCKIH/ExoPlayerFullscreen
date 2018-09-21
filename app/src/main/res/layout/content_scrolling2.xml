@@ -5,27 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:id="@+id/content_scroll"
     tools:context=".ScrollingActivity"
     tools:showIn="@layout/activity_detail">
 
     <LinearLayout
+        android:paddingTop="200dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/exo_player2"
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
-            -->
-
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/exo_player"
-            app:layout_anchor="@id/app_bar"
-            app:layout_anchorGravity="top|end"
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="@string/large_text" />
 
     </LinearLayout>
 
