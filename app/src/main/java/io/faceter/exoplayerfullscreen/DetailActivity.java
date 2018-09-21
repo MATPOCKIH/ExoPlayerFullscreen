@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,6 +26,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_detail);
+        setupWindowAnimations();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -48,9 +50,6 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         exoPlayerView = findViewById(R.id.exo_player);
-       // setupPlayerView(exoPlayerView, videoUrl);
-       // exoPlayerView.hideController();
-
         exoPlayerView.findViewById(R.id.exo_play)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -104,4 +103,9 @@ public class DetailActivity extends AppCompatActivity {
                 });
     }
 
+    private void setupWindowAnimations() {
+        Fade fade = new Fade();
+        fade.setDuration(1000);
+        getWindow().setEnterTransition(fade);
+    }
 }

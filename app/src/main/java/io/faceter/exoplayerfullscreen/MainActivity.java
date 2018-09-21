@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.view.View;
 
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setupWindowAnimations();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -97,6 +100,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        controlView.findViewById(R.id.exo_fullscreen_button)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getBaseContext(), FullscreenVideoActivity.class);
+                        intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
+                        startActivity(intent);
+                    }
+                });
+
         CardView card = (CardView) videoView.getParent();
 
         card.getChildAt(1).setOnClickListener(new View.OnClickListener() {
@@ -107,5 +120,11 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+    }
+
+    private void setupWindowAnimations() {
+        Slide slide = new Slide();
+        slide.setDuration(1000);
+        getWindow().setExitTransition(slide);
     }
 }
