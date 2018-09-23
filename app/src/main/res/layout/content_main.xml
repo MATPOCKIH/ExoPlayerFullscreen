@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:clipToPadding="true"
             android:padding="0dp"
             app:cardCornerRadius="8dp"
@@ -30,23 +29,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.exoplayer2.ui.PlayerView
-                android:id="@+id/player1"
+            <io.faceter.view.PlayerHolderView
+                android:id="@+id/holder1"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/black"
-                android:clipToPadding="true"
-                android:elevation="6dp"
-                app:controller_layout_id="@layout/exo_player_control_view"
-                app:surface_type="texture_view"
-                app:use_controller="true" />
+                android:layout_height="200dp" />
 
             <TextView
-                android:textSize="20sp"
+                android:id="@+id/title1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="210dp"
                 android:text="Перейти"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:textSize="20sp" />
 
         </android.support.v7.widget.CardView>
 
@@ -56,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:clipToPadding="true"
             android:padding="0dp"
             app:cardCornerRadius="8dp"
@@ -65,23 +60,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView">
 
-            <com.google.android.exoplayer2.ui.PlayerView
-                android:id="@+id/player2"
+            <io.faceter.view.PlayerHolderView
+                android:id="@+id/holder2"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/black"
-                android:clipToPadding="true"
-                android:elevation="6dp"
-                app:controller_layout_id="@layout/exo_player_control_view"
-                app:surface_type="texture_view"
-                app:use_controller="true" />
+                android:layout_height="200dp" />
 
             <TextView
-                android:textSize="20sp"
+                android:id="@+id/title2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="210dp"
                 android:text="Перейти"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:textSize="20sp" />
 
         </android.support.v7.widget.CardView>
 
@@ -91,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:clipToPadding="true"
             android:padding="0dp"
             app:cardCornerRadius="8dp"
@@ -100,18 +91,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView2">
 
-            <com.google.android.exoplayer2.ui.PlayerView
-                android:id="@+id/player3"
+            <io.faceter.view.PlayerHolderView
+                android:id="@+id/holder3"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/black"
-                android:clipToPadding="true"
-                android:elevation="6dp"
-                app:controller_layout_id="@layout/exo_player_control_view"
-                app:surface_type="texture_view"
-                app:use_controller="true" />
+                android:layout_height="200dp" />
 
             <TextView
+                android:id="@+id/title3"
                 android:textSize="20sp"
                 android:layout_marginTop="210dp"
                 android:text="Перейти"

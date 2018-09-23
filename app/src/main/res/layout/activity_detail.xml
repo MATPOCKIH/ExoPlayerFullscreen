@@ -51,32 +51,11 @@
         android:padding="12dp"
         android:layout_height="200dp">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/video_card_view"
+        <io.faceter.view.PlayerHolderView
+            android:id="@+id/player_holder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="true"
-            android:padding="0dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:layout_collapseMode="pin">
-
-            <com.google.android.exoplayer2.ui.PlayerView
-                android:id="@+id/exo_player"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/black"
-                app:use_controller="true"
-                app:surface_type="texture_view"
-                app:controller_layout_id="@layout/exo_player_control_view"
-                android:clipToPadding="true"
-                android:elevation="6dp" />
-
-        </android.support.v7.widget.CardView>
+            android:layout_height="200dp" />
 
     </FrameLayout>
-
-
 
 </android.support.design.widget.CoordinatorLayout>

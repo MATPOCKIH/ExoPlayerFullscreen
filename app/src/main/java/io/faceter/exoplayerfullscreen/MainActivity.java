@@ -3,22 +3,21 @@ package io.faceter.exoplayerfullscreen;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
 import android.view.View;
-
-import com.google.android.exoplayer2.ui.PlayerView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.faceter.util.ExoPlayerViewManager;
+import io.faceter.util.PlayerViewManager;
+import io.faceter.view.PlayerHolderView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<PlayerView> players = new ArrayList<>();
+    private List<PlayerHolderView> playerHolders = new ArrayList<>();
+    private List<TextView> links = new ArrayList<>();
 
     private List<String> mVideoUrls = new ArrayList<>(
             Arrays.asList(
@@ -27,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
                     "http://redirector.c.youtube.com/videoplayback?id=604ed5ce52eda7ee&itag=22&source=youtube&sparams=ip,ipbits,expire,source,id&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=513F28C7FDCBEC60A66C86C9A393556C99DC47FB.04C88036EEE12565A1ED864A875A58F15D8B5300&key=ik0",
                     "https://html5demos.com/assets/dizzy.mp4"
                     //"https://cdn.faceter.io/hls/ab196789-8876-4854-82f3-087e5682d013",
-                    //  "https://cdn.faceter.io/hls/65d1c673-6a63-44c8-836b-132449c9462a"
+                      //"https://cdn.faceter.io/hls/65d1c673-6a63-44c8-836b-132449c9462a"
             )
     );
 
@@ -35,16 +34,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupWindowAnimations();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        playerHolders.add((PlayerHolderView) findViewById(R.id.holder1));
+        playerHolders.add((PlayerHolderView) findViewById(R.id.holder2));
+        playerHolders.add((PlayerHolderView) findViewById(R.id.holder3));
 
-        players.add((PlayerView) findViewById(R.id.player1));
-        players.add((PlayerView) findViewById(R.id.player2));
-        players.add((PlayerView) findViewById(R.id.player3));
-
+        links.add((TextView) findViewById(R.id.title1));
+        links.add((TextView) findViewById(R.id.title2));
+        links.add((TextView) findViewById(R.id.title3));
     }
 
 
@@ -52,21 +52,26 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         int i = 0;
-        for (String videoUrl : mVideoUrls) {
-            ExoPlayerViewManager.getInstance(videoUrl).goToBackground();
-            setupPlayerView(players.get(i), videoUrl);
-            players.get(i).hideController();
+        for (final String videoUrl : mVideoUrls) {
+            playerHolders.get(i).setupPlayerView(videoUrl);
+            playerHolders.get(i).setOnUserInteractionListener(this);
+
+            links.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onVideoTitleClicked(videoUrl);
+                }
+            });
+
             i++;
         }
-
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
         for (String videoUrl : mVideoUrls) {
-            ExoPlayerViewManager.getInstance(videoUrl).goToBackground();
+            PlayerViewManager.getInstance(videoUrl).goToBackground();
         }
     }
 
@@ -74,57 +79,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         for (String videoUrl : mVideoUrls) {
-            ExoPlayerViewManager.getInstance(videoUrl).releaseVideoPlayer();
+            PlayerViewManager.getInstance(videoUrl).releaseVideoPlayer();
         }
     }
 
-    private void setupPlayerView(final PlayerView videoView, final String videoUrl) {
-        ExoPlayerViewManager.getInstance(videoUrl).prepareExoPlayer(this, videoView);
-        ExoPlayerViewManager.getInstance(videoUrl).goToForeground();
-
-        View controlView = videoView.findViewById(R.id.exo_controller);
-
-        controlView.findViewById(R.id.exo_play)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ExoPlayerViewManager.getInstance(videoUrl).playPlayer();
-                    }
-                });
-
-        controlView.findViewById(R.id.exo_pause)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ExoPlayerViewManager.getInstance(videoUrl).pausePlayer();
-                    }
-                });
-
-        controlView.findViewById(R.id.exo_fullscreen_button)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getBaseContext(), FullscreenVideoActivity.class);
-                        intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
-                        startActivity(intent);
-                    }
-                });
-
-        CardView card = (CardView) videoView.getParent();
-
-        card.getChildAt(1).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getBaseContext(), DetailActivity.class);
-                        intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
-                        startActivity(intent);
-                    }
-                });
-    }
-
-    private void setupWindowAnimations() {
-        Slide slide = new Slide();
-        slide.setDuration(1000);
-        getWindow().setExitTransition(slide);
+    public void onVideoTitleClicked(String videoUrl) {
+        Intent intent = new Intent(getBaseContext(), DetailActivity.class);
+        intent.putExtra(PlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
+        startActivity(intent);
     }
 }

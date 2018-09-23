@@ -1,4 +1,4 @@
-package io.faceter.util;
+package io.faceter.view;
 
 import android.content.Context;
 import android.net.Uri;
@@ -16,85 +16,57 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-import java.util.HashMap;
-import java.util.Map;
+import io.faceter.exoplayerfullscreen.R;
 
-public class ExoPlayerViewManager {
+import static com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
+import static com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT;
 
-    private static final String TAG = "ExoPlayerViewManager";
+public class FaceterExoPlayerView extends UniversalPlayerView {
 
-    public static final String EXTRA_VIDEO_URI = "video_uri";
-
-    private static Map<String, ExoPlayerViewManager> instances = new HashMap<>();
     private Uri videoUri;
-
     private DefaultDataSourceFactory dataSourceFactory;
     private SimpleExoPlayer player;
-    public boolean isPlayerPlaying;
-    private boolean isMustPlaying;
+    private PlayerView exoPlayerView;
+    private Context context;
 
-
-    public static ExoPlayerViewManager getInstance(String videoUri) {
-        ExoPlayerViewManager instance = instances.get(videoUri);
-        if (instance == null) {
-            instance = new ExoPlayerViewManager(videoUri);
-            instances.put(videoUri, instance);
-        }
-        return instance;
+    public FaceterExoPlayerView(Context context) {
+        this.context = context;
     }
 
-    private ExoPlayerViewManager(String videoUri) {
-        this.videoUri = Uri.parse(videoUri);
-    }
+    @Override
+    public void initialize(Uri videoUri, PlayerHolderView playerHolderView) {
 
-    public void prepareExoPlayer(Context context, PlayerView exoPlayerView) {
-        if (context == null || exoPlayerView == null) {
+        if (playerHolderView == null || videoUri == null)
             return;
-        }
-        if (player == null) {
 
-            player =
-                    ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector());
+        exoPlayerView = playerHolderView.findViewById(R.id.exo_player);
+
+
+        if (player == null) {
+            player = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector());
 
             dataSourceFactory = new DefaultDataSourceFactory(context,
-                    Util.getUserAgent(context, "exoplayerfullscreen"));
-
-            /*
-            MediaSource videoSource = new HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(videoUri);*/
+                    Util.getUserAgent(context, "faceter"));
 
             MediaSource videoSource = buildMediaSource(videoUri, null);
-
-            // Prepare the player with the source.
-            isPlayerPlaying = true;
-            isMustPlaying = true;
             player.prepare(videoSource);
         }
+
         player.clearVideoSurface();
-      //  player.setVideoSurfaceView((SurfaceView) exoPlayerView.getVideoSurfaceView());
         player.setVideoTextureView((TextureView) exoPlayerView.getVideoSurfaceView());
-       // player.seekTo(player.getCurrentPosition() + 1);
         exoPlayerView.setPlayer(player);
+        exoPlayerView.hideController();
+        setResizeModeFill(playerHolderView.isResizeModeFill());
     }
 
-    public void releaseVideoPlayer() {
-        if (player != null) {
-            player.release();
-        }
-        player = null;
+    @Override
+    public void play() {
+        player.setPlayWhenReady(true);
     }
 
-    public void goToBackground() {
-        if (player != null && !isMustPlaying) {
-            isPlayerPlaying = player.getPlayWhenReady();
-            player.setPlayWhenReady(false);
-        }
-    }
-
-    public void goToForeground() {
-        if (player != null && isMustPlaying) {
-            player.setPlayWhenReady(isPlayerPlaying);
-        }
+    @Override
+    public void pause() {
+        player.setPlayWhenReady(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -131,19 +103,20 @@ public class ExoPlayerViewManager {
         }
     }
 
-    public void pausePlayer(){
+    @Override
+    public void release() {
         if (player != null) {
-            player.setPlayWhenReady(false);
-            isPlayerPlaying = false;
-            isMustPlaying = false;
+            player.release();
         }
+        player = null;
     }
 
-    public void playPlayer(){
-        if (player != null) {
-            player.setPlayWhenReady(true);
-            isPlayerPlaying = true;
-            isMustPlaying = true;
+    @Override
+    public void setResizeModeFill(boolean isResizeModeFill) {
+        if (isResizeModeFill) {
+            exoPlayerView.setResizeMode(RESIZE_MODE_FILL);
+        } else {
+            exoPlayerView.setResizeMode(RESIZE_MODE_FIT);
         }
     }
 }

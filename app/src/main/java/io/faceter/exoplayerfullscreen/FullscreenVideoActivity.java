@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.google.android.exoplayer2.ui.PlayerView;
-
-import io.faceter.util.ExoPlayerViewManager;
+import io.faceter.util.PlayerViewManager;
+import io.faceter.view.PlayerHolderView;
 
 // Fullscreen related code taken from Android Studio blueprint
 public class FullscreenVideoActivity extends AppCompatActivity {
@@ -54,12 +52,14 @@ public class FullscreenVideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen_video);
 
         mContentView = findViewById(R.id.enclosing_layout);
-        PlayerView playerView = findViewById(R.id.player_view);
 
-        mVideoUri = getIntent().getStringExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI);
-        ExoPlayerViewManager.getInstance(mVideoUri)
-                .prepareExoPlayer(this, playerView);
+        PlayerHolderView playerHolderView = findViewById(R.id.player_holder);
+        playerHolderView.setResizeModeFill(false);
 
+        mVideoUri = getIntent().getStringExtra(PlayerViewManager.EXTRA_VIDEO_URI);
+
+        PlayerViewManager.getInstance(mVideoUri).preparePlayer(playerHolderView);
+/*
         // Set the fullscreen button to "close fullscreen" icon
         View controlView = playerView.findViewById(R.id.exo_controller);
         ImageView fullscreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
@@ -77,7 +77,7 @@ public class FullscreenVideoActivity extends AppCompatActivity {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ExoPlayerViewManager.getInstance(mVideoUri).playPlayer();
+                        PlayerViewManager.getInstance(mVideoUri).playPlayer();
                     }
                 });
 
@@ -85,21 +85,21 @@ public class FullscreenVideoActivity extends AppCompatActivity {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ExoPlayerViewManager.getInstance(mVideoUri).pausePlayer();
+                        PlayerViewManager.getInstance(mVideoUri).pausePlayer();
                     }
-                });
+                });*/
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ExoPlayerViewManager.getInstance(mVideoUri).goToForeground();
+        PlayerViewManager.getInstance(mVideoUri).goToForeground();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        ExoPlayerViewManager.getInstance(mVideoUri).goToBackground();
+        PlayerViewManager.getInstance(mVideoUri).goToBackground();
     }
 
     @Override

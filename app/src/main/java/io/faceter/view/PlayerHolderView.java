@@ -1,21 +1,23 @@
 package io.faceter.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.google.android.exoplayer2.ui.PlayerView;
-
+import io.faceter.exoplayerfullscreen.FullscreenVideoActivity;
 import io.faceter.exoplayerfullscreen.R;
+import io.faceter.util.PlayerViewManager;
 
 public class PlayerHolderView extends FrameLayout {
 
-    private PlayerView exoPlayerView;
+    private String videoUrl;
+
+    private boolean isResizeModeFill = true;
 
     private OnUserInteractionListener onUserInteractionListener;
 
@@ -43,8 +45,7 @@ public class PlayerHolderView extends FrameLayout {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //ExoPlayerViewManager.getInstance(videoUrl).playPlayer();
-                        onUserInteractionListener.onPlayClicked();
+                        PlayerViewManager.getInstance(videoUrl).playPlayer();
                     }
                 });
 
@@ -52,8 +53,7 @@ public class PlayerHolderView extends FrameLayout {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // ExoPlayerViewManager.getInstance(videoUrl).pausePlayer();
-                        onUserInteractionListener.onPauseClicked();
+                        PlayerViewManager.getInstance(videoUrl).pausePlayer();
                     }
                 });
 
@@ -61,38 +61,51 @@ public class PlayerHolderView extends FrameLayout {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        /*Intent intent = new Intent(getBaseContext(), FullscreenVideoActivity.class);
-                        intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
-                        startActivity(intent);*/
-                        onUserInteractionListener.onFullscreenClicked();
+                        Intent intent = new Intent(getContext(), FullscreenVideoActivity.class);
+                        intent.putExtra(PlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
+                        getContext().startActivity(intent);
                     }
                 });
-
+/*
         CardView card = this.findViewById(R.id.video_card_view);
 
         card.getChildAt(1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent = new Intent(getBaseContext(), DetailActivity.class);
-                intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
-                startActivity(intent);*/
-                onUserInteractionListener.onVideoTitleClicked();
+//                Intent intent = new Intent(getBaseContext(), DetailActivity.class);
+//                intent.putExtra(ExoPlayerViewManager.EXTRA_VIDEO_URI, videoUrl);
+//                startActivity(intent);
+                onUserInteractionListener.onVideoTitleClicked(videoUrl);
             }
-        });
+        });*/
     }
 
     public void setOnUserInteractionListener(OnUserInteractionListener onUserInteractionListener) {
         this.onUserInteractionListener = onUserInteractionListener;
     }
 
-    interface OnUserInteractionListener {
+    public void setupPlayerView(String videoUrl) {
+        this.videoUrl = videoUrl;
+        PlayerViewManager.getInstance(videoUrl).preparePlayer(this);
+        PlayerViewManager.getInstance(videoUrl).goToForeground();
+    }
+
+    public void setResizeModeFill(boolean isResizeModeFill){
+        this.isResizeModeFill = isResizeModeFill;
+    }
+
+    public boolean isResizeModeFill() {
+        return isResizeModeFill;
+    }
+
+    public interface OnUserInteractionListener {
         void onPauseClicked();
 
         void onPlayClicked();
 
         void onFullscreenClicked();
 
-        void onVideoTitleClicked();
+        void onVideoTitleClicked(String videoUrl);
     }
 
 }
